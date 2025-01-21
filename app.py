@@ -97,5 +97,28 @@ def ask():
     except Exception as e:
         return jsonify({'error': f'MongoDB error: {str(e)}'}), 500
 
+@app.route('/upload_knowledge_base', methods=['POST'])
+def upload_knowledge_base():
+    """Upload a file and update the knowledge base."""
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part in the request'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected for uploading'}), 400
+
+    try:
+        # Save the file to the 'data' folder
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(file_path)
+
+        # Update the knowledge base
+        update_knowledge_base(file_path)
+
+        return jsonify({'message': f'File {filename} successfully uploaded and added to the knowledge base.'}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to process the file: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

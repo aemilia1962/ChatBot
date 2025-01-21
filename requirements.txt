@@ -1,0 +1,8 @@
+Flask
+langchain-community
+langchain
+langchain-ollama
+langchain-chroma
+chroma
+Flask
+pymongo

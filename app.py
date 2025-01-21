@@ -1,0 +1,86 @@
+from flask import Flask, request, jsonify
+from werkzeug.utils import secure_filename
+import os
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+from models import update_knowledge_base  
+
+# เชื่อมต่อ MongoDB
+client = MongoClient('mongodb://localhost:27017/')
+db = client['chat_database']
+sessions_collection = db['sessions']
+sessions_collection.create_index('session_id')  # เพิ่ม Indexssss
+
+app = Flask(__name__)
+app.config['UPLOAD_FOLDER'] = 'data' 
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+@app.route('/start_session', methods=['POST'])
+def start_session():
+    data = request.get_json()
+    if not data or 'user_id' not in data:
+        return jsonify({'error': 'Invalid payload or missing user_id.'}), 400
+
+    user_id = data['user_id'].strip()
+    if not user_id:
+        return jsonify({'error': 'User ID is required.'}), 400
+
+    session = {
+        'user_id': user_id,
+        'session_id': str(ObjectId()),
+        'messages': []
+    }
+    sessions_collection.insert_one(session)
+    return jsonify({'session_id': session['session_id']}), 200
+
+@app.route('/save_message', methods=['POST'])
+def save_message():
+    data = request.get_json()
+    if not data or not all(k in data for k in ['session_id', 'message', 'response']):
+        return jsonify({'error': 'Invalid payload or missing fields.'}), 400
+
+    session_id = data['session_id'].strip()
+    user_message = data['message'].strip()
+    bot_response = data['response'].strip()
+
+    try:
+        session = sessions_collection.find_one({'session_id': session_id})
+        if not session:
+            return jsonify({'error': 'Invalid session ID.'}), 404
+
+        sessions_collection.update_one(
+            {'session_id': session_id},
+            {'$push': {'messages': {'user_message': user_message, 'bot_response': bot_response}}}
+        )
+        return jsonify({'message': 'Message saved successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': f'MongoDB error: {str(e)}'}), 500
+
+@app.route('/ask', methods=['POST'])
+def ask():
+    data = request.get_json()
+    if not data or not all(k in data for k in ['session_id', 'question']):
+        return jsonify({'error': 'Invalid payload or missing fields.'}), 400
+
+    session_id = data['session_id'].strip()
+    question = data['question'].strip()
+
+    try:
+        if question.lower() in ['hi', 'hello']:
+            answer = 'Hello! How can I assist you with Techberry products today?'
+        else:
+            from models import rag_chain
+            answer = rag_chain(question)
+            if not answer or answer.strip() == "":
+                answer = "I'm sorry, I cannot find this information in the provided context. Do you have any questions about Techberry products?"
+
+        sessions_collection.update_one(
+            {'session_id': session_id},
+            {'$push': {'messages': {'user_message': question, 'bot_response': answer}}}
+        )
+        return jsonify({'answer': answer})
+    except Exception as e:
+        return jsonify({'error': f'MongoDB error: {str(e)}'}), 500
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)

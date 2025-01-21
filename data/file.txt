@@ -1,0 +1,211 @@
+TechBerry Company Overview and Product Portfolio
+Company Background:
+TechBerry is a Thailand-based software product company specializing in enterprise integration solutions and digital transformation enablement. The company focuses on bridging legacy systems with modern digital technologies through innovative low-code platforms and integration solutions.
+
+Core Technology Platforms:
+
+1. SSQUARE APIs Generator
+Key Features:
+- Graphical user interface (GUI) wizards for simplified API development
+- Automated code generation and deployment
+- Built-in testing capabilities
+- Universal plugin adapters for diverse system integration
+- Support for multiple middleware platforms
+- XML/JSON data transformation
+- Comprehensive API documentation generation
+
+Benefits:
+- Reduces API development time by up to 80%
+- Minimizes coding errors through automation
+- Ensures consistent API development standards
+- Supports rapid integration with both legacy and modern systems
+- Facilitates standardization across enterprise applications
+
+2. Dynamic Mobile Application (DMA)
+Core Capabilities:
+- Low-code mobile application development platform
+- Cross-platform development support (iOS & Android)
+- Drag-and-drop interface builder
+- Pre-built component library
+- Built-in enterprise integration features
+- Real-time preview capabilities
+- Automated testing tools
+
+Key Advantages:
+- Rapid mobile app development and deployment
+- Significant reduction in development costs
+- Consistent user experience across platforms
+- Enterprise-grade security features
+- Seamless backend integration
+- Support for offline functionality
+- Regular updates and maintenance
+
+3. SSQUARE iConnect
+Platform Features:
+- Enterprise application integration
+- Real-time data synchronization
+- Multi-protocol support
+- Built-in monitoring and logging
+- Scalable architecture
+- High-performance message processing
+- Error handling and recovery
+
+4. CollabX
+Platform Features:
+- Omni-channel communication platform
+- Seamless LINE Messenger integration
+- Advanced AI chatbot capabilities
+- 24/7 automated customer support
+- Intelligent human handover
+- Real-time response management
+- Multi-channel conversation history
+
+Key Advantages:
+- Continuous customer support availability
+- Intelligent automated responses
+- Seamless transition to human agents
+- Reduced customer response time
+- Scalable customer engagement
+- Comprehensive conversation analytics
+- Enhanced customer experience
+
+Integration Capabilities:
+- AS/400 system integration
+- Modern API connectivity
+- Database integration
+- File system integration
+- Message queue support
+- Web service integration
+- Cloud service connectivity
+
+Technical Specifications:
+
+System Requirements:
+- Java Runtime Environment (JRE) 1.8 or higher
+- Support for multiple operating systems
+- Minimal hardware requirements
+- Scalable deployment options
+
+Security Features:
+- End-to-end encryption
+- Role-based access control
+- Audit logging
+- Secure data transmission
+- Authentication and authorization
+- API security standards compliance
+
+Development Standards:
+- Industry-standard development practices
+- Version control integration
+- Continuous integration support
+- Automated testing frameworks
+- Documentation generation
+- Code quality assurance
+
+Implementation Methodology:
+
+Deployment Process:
+1. Requirement Analysis
+2. System Design
+3. Configuration and Development
+4. Testing and Validation
+5. Deployment and Integration
+6. Monitoring and Support
+
+Support Services:
+- Technical implementation support
+- Training and documentation
+- Regular maintenance updates
+- Performance optimization
+- Security patches
+- 24/7 technical assistance
+
+Use Cases and Applications:
+
+1. Financial Services:
+- Core banking system integration
+- Payment gateway integration
+- Mobile banking solutions
+- Financial API development
+- Transaction processing systems
+
+2. Insurance Sector:
+- Policy management integration
+- Claims processing automation
+- Agent portal development
+- Customer service applications
+- Document management systems
+
+3. Enterprise Solutions:
+- Legacy system modernization
+- Digital transformation projects
+- Mobile workforce solutions
+- Customer engagement platforms
+- Business process automation
+
+Integration Scenarios:
+
+1. System Integration:
+- AS/400 to modern system connectivity
+- Database to API integration
+- Legacy to cloud migration
+- Cross-platform data synchronization
+- Real-time system updates
+
+2. Application Development:
+- Enterprise mobile applications
+- Web service integration
+- API-first development
+- Microservices architecture
+- Cloud-native applications
+
+3. Digital Transformation:
+- Legacy system modernization
+- Process automation
+- Digital channel integration
+- Customer experience enhancement
+- Operational efficiency improvement
+
+Performance Metrics:
+
+Development Efficiency:
+- 80% reduction in API development time
+- 70% faster mobile app development
+- Significant reduction in testing time
+- Improved deployment efficiency
+- Reduced maintenance overhead
+
+System Performance:
+- High-throughput message processing
+- Real-time data synchronization
+- Minimal latency
+- Scalable architecture
+- Robust error handling
+
+Value Proposition:
+1. Accelerated digital transformation
+2. Reduced development costs
+3. Improved time-to-market
+4. Enhanced system integration
+5. Preserved IT investments
+6. Standardized development practices
+7. Enterprise-grade security
+8. Comprehensive support services
+
+Future-Ready Features:
+- Cloud-native architecture support
+- Microservices integration
+- Container deployment options
+- API-first development approach
+- Blockchain integration capabilities
+- AI/ML integration readiness
+- IoT device connectivity
+
+TechBerry Company Overview and Product Portfolio
+Note: These links are provided for reference purposes as of 2024. Please verify current URLs as they may change over time.
+Reference Links:
+- SSQUARE APIs Generator: https://web.techberry.tech/ssquare-apis-generator/
+- Dynamic Mobile Application (DMA): https://web.techberry.tech/dynamic-mobile-application/
+- SSQUARE iConnect: https://web.techberry.tech/ssquare-iconnect/
+- CollabX: https://web.techberry.tech/collabx/
+- Company Website: https://web.techberry.tech/

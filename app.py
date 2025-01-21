@@ -99,7 +99,7 @@ def ask():
 
 @app.route('/upload_knowledge_base', methods=['POST'])
 def upload_knowledge_base():
-    """Upload a file and update the knowledge base."""
+    """Upload a file and update the knowledge base and vector store."""
     if 'file' not in request.files:
         return jsonify({'error': 'No file part in the request'}), 400
     
@@ -113,12 +113,14 @@ def upload_knowledge_base():
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # Update the knowledge base
-        update_knowledge_base(file_path)
+        # Update the knowledge base and vector store
+        from models import update_knowledge_base  # Import the function
+        update_knowledge_base(file_path)  # Pass the file to be processed and stored
 
-        return jsonify({'message': f'File {filename} successfully uploaded and added to the knowledge base.'}), 200
+        return jsonify({'message': f'File {filename} successfully uploaded and added to the vector store.'}), 200
     except Exception as e:
         return jsonify({'error': f'Failed to process the file: {str(e)}'}), 500
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

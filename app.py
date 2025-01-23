@@ -4,16 +4,28 @@ import os
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from models import update_knowledge_base, update_instruction
+from datetime import datetime
 
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
 db = client['chat_database']
 sessions_collection = db['sessions']
 sessions_collection.create_index('session_id')  # Create index for better query performance
+instructions_collection = db['instructions']
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'data'
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Load the latest instruction from MongoDB or set default
+
+def load_latest_instruction():
+    latest_instruction = instructions_collection.find_one(sort=[("timestamp", -1)])
+    if latest_instruction:
+        return latest_instruction['instruction']
+    return "You are a knowledgeable and friendly assistant for TechBerry."
+
+current_instruction = load_latest_instruction()
 
 @app.route('/start_session', methods=['POST'])
 def start_session():
@@ -26,9 +38,15 @@ def start_session():
     if not user_id:
         return jsonify({'error': 'User ID is required.'}), 400
 
+    # Get the latest instruction ID
+    latest_instruction = instructions_collection.find_one(sort=[("timestamp", -1)])
+    if not latest_instruction:
+        return jsonify({'error': 'No instructions found in the database.'}), 500
+
     session = {
         'user_id': user_id,
         'session_id': str(ObjectId()),
+        'current_instruction_id': str(latest_instruction['_id']),
         'messages': []
     }
     sessions_collection.insert_one(session)
@@ -74,19 +92,25 @@ def ask():
         if not session:
             return jsonify({'error': 'Invalid session ID.'}), 404
 
-        # Construct context from the previous messages
+        # Retrieve the instruction associated with the session
+        instruction_id = session['current_instruction_id']
+        instruction = instructions_collection.find_one({'_id': ObjectId(instruction_id)})
+        if not instruction:
+            return jsonify({'error': 'Instruction not found for this session.'}), 404
+
+        # Build context from session messages
         context = "\n".join(
             [f"User: {msg['user_message']}\nBot: {msg['bot_response']}" for msg in session['messages']]
         )
 
-        # Generate response
-        if question.lower() in ['hi', 'hello']:
-            answer = 'Hello! How can I assist you with Techberry products today?'
-        else:
-            from models import rag_chain
-            answer = rag_chain(f"{context}\nUser: {question}")
-            if not answer or answer.strip() == "":
-                answer = "I'm sorry, I cannot find this information in the provided context. Do you have any questions about Techberry products?"
+        # Generate response using the instruction and context
+        from models import rag_chain
+        prompt = f"{instruction['instruction']}\nContext: {context}\nQuestion: {question}\nAnswer:"
+        answer = rag_chain(prompt)
+
+        # Handle empty or invalid responses
+        if not answer or answer.strip() == "":
+            answer = "I'm sorry, I cannot find this information. Please try asking differently."
 
         # Save the new message to the session
         sessions_collection.update_one(
@@ -96,6 +120,7 @@ def ask():
         return jsonify({'answer': answer})
     except Exception as e:
         return jsonify({'error': f'MongoDB error: {str(e)}'}), 500
+
 
 @app.route('/upload_knowledge_base', methods=['POST'])
 def upload_knowledge_base():
@@ -133,10 +158,90 @@ def set_instruction():
         return jsonify({'error': 'Instruction cannot be empty.'}), 400
 
     try:
-        update_instruction(instruction)
+        instructions_collection.insert_one({
+            'instruction': instruction,
+            'timestamp': datetime.utcnow()
+        })
         return jsonify({'message': 'Instruction updated successfully.'}), 200
     except Exception as e:
         return jsonify({'error': f'Failed to update instruction: {str(e)}'}), 500
+
+@app.route('/get_instruction', methods=['POST'])
+def get_instruction():
+    """Retrieve the instruction for a given user ID."""
+    data = request.get_json()
+    if not data or 'user_id' not in data:
+        return jsonify({'error': 'User ID is required.'}), 400
+
+    user_id = data['user_id'].strip()
+    if not user_id:
+        return jsonify({'error': 'User ID cannot be empty.'}), 400
+
+    try:
+        session = sessions_collection.find_one({'user_id': user_id})
+        if not session:
+            return jsonify({'error': 'Session not found for this user.'}), 404
+
+        instruction_id = session['current_instruction_id']
+        instruction = instructions_collection.find_one({'_id': ObjectId(instruction_id)})
+        if not instruction:
+            return jsonify({'error': 'Instruction not found for this session.'}), 404
+
+        return jsonify({'instruction': instruction['instruction']}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to retrieve instruction: {str(e)}'}), 500
+
+def create_session_with_instruction(user_id: str) -> str:
+    # ดึง Instruction ล่าสุดจาก MongoDB
+    latest_instruction = db['instructions'].find_one(sort=[("timestamp", -1)])
+    if not latest_instruction:
+        raise ValueError("No instructions found in the database.")
+
+    session = {
+        'user_id': user_id,
+        'session_id': str(ObjectId()),
+        'current_instruction_id': str(latest_instruction["_id"]),
+        'messages': []
+    }
+    sessions_collection.insert_one(session)
+    return session['session_id']
+
+@app.route('/create_session', methods=['POST'])
+def create_session():
+    data = request.get_json()
+    if not data or 'user_id' not in data:
+        return jsonify({'error': 'User ID is required.'}), 400
+
+    user_id = data['user_id'].strip()
+    if not user_id:
+        return jsonify({'error': 'User ID cannot be empty.'}), 400
+
+    try:
+        session_id = create_session_with_instruction(user_id)
+        return jsonify({'message': 'Session created successfully.', 'session_id': session_id}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to create session: {str(e)}'}), 500
+
+@app.route('/add_instruction', methods=['POST'])
+def add_instruction():
+    """Add a new instruction to the database without updating the runtime prompt."""
+    data = request.get_json()
+    if not data or 'instruction' not in data:
+        return jsonify({'error': 'Instruction field is required.'}), 400
+
+    instruction = data['instruction'].strip()
+    if not instruction:
+        return jsonify({'error': 'Instruction cannot be empty.'}), 400
+
+    try:
+        # เพิ่ม Instruction ลง MongoDB
+        instruction_id = db['instructions'].insert_one({
+            "instruction": instruction,
+            "timestamp": datetime.utcnow()
+        }).inserted_id
+        return jsonify({'message': 'Instruction added successfully.', 'instruction_id': str(instruction_id)}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to add instruction: {str(e)}'}), 500
 
 
 if __name__ == '__main__':

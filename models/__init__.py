@@ -70,4 +70,13 @@ def rag_chain(question: str) -> str:
     response = llm.invoke(prompt)
     return response.content.strip() if response.content.strip() else "I'm sorry, I couldn't generate a response based on the context."
 
-
+def update_instruction(new_instruction: str):
+    """
+    Update the global instruction prompt template.
+    Args:
+        new_instruction (str): The new instruction text.
+    """
+    global prompt_template
+    prompt_template = ChatPromptTemplate.from_template(
+        f"{new_instruction}\nContext: {{context}}\nQuestion: {{question}}\nAnswer:"
+    )

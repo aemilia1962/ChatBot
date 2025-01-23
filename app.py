@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 import os
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-from models import update_knowledge_base
+from models import update_knowledge_base, update_instruction
 
 # Connect to MongoDB
 client = MongoClient('mongodb://localhost:27017/')
@@ -120,6 +120,23 @@ def upload_knowledge_base():
         return jsonify({'message': f'File {filename} successfully uploaded and added to the vector store.'}), 200
     except Exception as e:
         return jsonify({'error': f'Failed to process the file: {str(e)}'}), 500
+
+@app.route('/set_instruction', methods=['POST'])
+def set_instruction():
+    """Update the instruction prompt used by the model."""
+    data = request.get_json()
+    if not data or 'instruction' not in data:
+        return jsonify({'error': 'Instruction field is required.'}), 400
+
+    instruction = data['instruction'].strip()
+    if not instruction:
+        return jsonify({'error': 'Instruction cannot be empty.'}), 400
+
+    try:
+        update_instruction(instruction)
+        return jsonify({'message': 'Instruction updated successfully.'}), 200
+    except Exception as e:
+        return jsonify({'error': f'Failed to update instruction: {str(e)}'}), 500
 
 
 if __name__ == '__main__':

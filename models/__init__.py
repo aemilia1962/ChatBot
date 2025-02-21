@@ -78,5 +78,5 @@ def update_instruction(new_instruction: str):
     """
     global prompt_template
     prompt_template = ChatPromptTemplate.from_template(
-        f"{new_instruction}\nContext: {{context}}\nQuestion: {{question}}\nAnswer:"
+        f"instruction: {new_instruction}\nContext: {{context}}\nQuestion: {{question}}\nAnswer:"
     )
